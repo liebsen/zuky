@@ -141,8 +141,8 @@ function startMediaDevices () {
     }
   )
 }
-// const socket = io.connect('zuky.herokuapp.com')
-const socket = io.connect('192.168.2.13:5000', { query: `room=${roomId}` })
+const socket = io.connect('zuky.herokuapp.com', { query: `room=${roomId}` })
+// const socket = io.connect('192.168.2.13:5000', { query: `room=${roomId}` })
 
 socket.on('connect', function(data) {
   localSocketId = socket.id
