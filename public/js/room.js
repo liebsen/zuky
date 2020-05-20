@@ -95,6 +95,7 @@ function debug(text) {
 function addVideoSource(stream, muted) {
   let id = sanitizeStreamId(stream.id)
   if (!document.getElementById(id)) {
+    debug('stream: ' + id)
     var videoCont = document.createElement('div')
     videoCont.className = 'column is-2'
     videoCont.id = id
@@ -121,11 +122,31 @@ async function callUser(socketId) {
   })
 }
 
+function startMediaDevices () {
+  navigator.getUserMedia = ( navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia || navigator.msGetUserMedia)
+  navigator.getUserMedia(
+    { video: true, audio: true },
+    stream => {
+      localStreamId = sanitizeStreamId(stream.id)
+      addVideoSource(stream, true)
+      socket.emit('stream', {
+        room: roomId,
+        socket: localSocketId,
+        stream: localStreamId
+      })
+      stream.getTracks().forEach(track => peerConnection.addTrack(track, stream))
+    },
+    error => {
+      console.warn(error.message)
+    }
+  )
+}
 // const socket = io.connect('zuky.herokuapp.com')
 const socket = io.connect('192.168.2.13:5000', { query: `room=${roomId}` })
 
 socket.on('connect', function(data) {
   localSocketId = socket.id
+  startMediaDevices()
 })
 
 socket.on('roomlist', data => {
@@ -184,8 +205,10 @@ socket.on('answered', async data => {
 })
 
 socket.on('left', data => {
-  if (document.getElementById(data.id)) {
-    document.getElementById(data.id).remove()
+  debug('left: ' + data.stream)
+  if (document.getElementById(data.stream)) {
+    debug('removed: ' + data.stream)
+    document.getElementById(data.stream).remove()
   }
 })
 
@@ -193,23 +216,10 @@ peerConnection.ontrack = function({ streams: [stream] }) {
   addVideoSource(stream)
 }
 
-navigator.getUserMedia = ( navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia || navigator.msGetUserMedia)
-navigator.getUserMedia(
-  { video: true, audio: true },
-  stream => {
-    localStreamId = sanitizeStreamId(stream.id)
-    addVideoSource(stream, true)
-    stream.getTracks().forEach(track => peerConnection.addTrack(track, stream))
-  },
-  error => {
-    console.warn(error.message)
-  }
-)
-
 window.onbeforeunload = () => {
   socket.emit('leave', {
     room: roomId,
-    id: localStreamId
+    stream: localStreamId
   })
 }
 

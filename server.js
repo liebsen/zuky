@@ -4,9 +4,10 @@ var path = require('path')
 var app = express()
 var cors = require('cors')
 var activeSockets = {}
+var activeStreams = {}
 var allowedOrigins = [
   'https://localhost:5000',
-  'https://comino.herokuapp.com'
+  'https://zuky.herokuapp.com'
 ]
 
 app.use(cors({
@@ -92,11 +93,18 @@ io.on('connection', socket => {
     })
   })
 
+  socket.on('stream', data => {
+    if (!activeStreams[data.room]) {
+      activeStreams[data.room] = {}
+    }
+    activeStreams[data.room][data.socket] = data.stream
+  })
+
   socket.on('leave', data => {
-    console.log('leave room ' + data.id)
+    console.log('leave room ' + data.room)
     socket.emit('left', {
-      room: room,
-      id: data.id
+      room: data.room,
+      stream: data.stream
     })
   }) 
 
@@ -107,9 +115,18 @@ io.on('connection', socket => {
         activeSockets[room] = activeSockets[room].filter(
           existingSocket => existingSocket !== socket.id
         )
-        socket.emit('left', {
-          room: room,
-          id: socket.id
+        let stream = ''
+        if (activeStreams[room]) {
+          stream = activeStreams[room][socket.id]
+        }
+        console.log('left: ' + socket.id)
+        console.log('stream: ' + stream)
+        activeSockets[room].map(socketId => {
+          console.log('to: ' + socketId)
+          socket.to(socketId).emit('left', {
+            socket: socket.id,
+            stream: stream
+          })
         })
       }
     }    
