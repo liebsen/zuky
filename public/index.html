@@ -11,6 +11,7 @@
     />
     <link rel="stylesheet" type="text/css" href="/css/bulma.css" />
     <link rel="stylesheet" href="/css/styles.css" />
+    <script src="/js/fontawesome.js"></script>
     <script src="/js/socket.io.js"></script>
   </head>
   <body>
@@ -22,15 +23,26 @@
         </h1>
       </div>
     </header>
-    <div class="content-container">
-      <div class="active-users-panel" id="active-user-container">
-        <h3 class="panel-title">Active Users:</h3>
-      </div>
-      <div class="video-chat-container">
-        <h2 class="talk-info" id="talking-with-info">
-          Select active user on the left menu.
-        </h2>
+    <div class="container">
+      <div class="columns is-mobile is-centered">
+        <div class="column is-half">
+          <div class="has-text-centered">
+            <div class="field has-addons">
+              <div class="control">
+                <input id="room" class="input is-medium is-white is-rounded" name="query" type="text" placeholder="Nombre del salón" value="test" autofocus>
+              </div>
+              <div class="control">
+                <button type="submit" class="button is-medium is-rounded is-white" onclick="location.href = '/r/' + document.getElementById('room').value">
+                  <span class="icon has-text-info">
+                    <span class="fa fa-layer-group"></span>
+                  </span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
+    <script src="/js/fontawesome.js"></script>
   </body>
 </html>
