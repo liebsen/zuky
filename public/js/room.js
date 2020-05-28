@@ -7,7 +7,7 @@ let localSocketId = ''
 let roomId = location.pathname.split('/').reverse()[0]
 let videoSources = []
 let alreadyCalled = []
-const configuration = {'iceServers': [{'urls': 'stun:stun.l.google.com:19302'}]}
+const configuration = { iceServers: [{ urls: ["stun:stun1.l.google.com:19302", "stun:stun2.l.google.com:19305" ]}]}
 const { RTCPeerConnection, RTCSessionDescription } = window
 const peerConnection = new RTCPeerConnection(configuration)
 
